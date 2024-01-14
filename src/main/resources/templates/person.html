@@ -49,6 +49,7 @@
                     <p>Are you sure you want to delete this user?</p>
                 </div>
                 <div class="modal-footer">
+                    <input type="hidden" name="csrfToken" th:value="${CSRF_TOKEN}">
                     <button type="submit" class="btn btn-danger" id="deleteUser">Delete</button>
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
                 </div>

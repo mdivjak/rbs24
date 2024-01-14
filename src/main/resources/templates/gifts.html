@@ -42,7 +42,7 @@
       </tr>
       </tbody>
     </table>
-    <a href="/create-form">Add Gift</a>
+    <a sec:authorize="hasAuthority('CREATE_GIFT')" href="/create-form">Add Gift</a>
   </div>
   <template id="row-template">
     <tr>

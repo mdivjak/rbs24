@@ -5,6 +5,7 @@ import com.zuehlke.securesoftwaredevelopment.domain.*;
 import com.zuehlke.securesoftwaredevelopment.repository.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -38,12 +39,14 @@ public class GiftController {
     }
 
     @GetMapping("/")
+    @PreAuthorize("hasAuthority('VIEW_GIFT_LIST')")
     public String showSearch(Model model) {
         model.addAttribute("gifts", giftRepository.getAll());
         return "gifts";
     }
 
     @GetMapping("/create-form")
+    @PreAuthorize("hasAuthority('CREATE_GIFT')")
     public String CreateForm(Model model) {
         model.addAttribute("tags", tagRepository.getAll());
         return "create-form";
@@ -51,11 +54,13 @@ public class GiftController {
 
     @GetMapping(value = "/api/gifts/search", produces = "application/json")
     @ResponseBody
+    @PreAuthorize("hasAuthority('VIEW_GIFT_LIST')")
     public List<Gift> search(@RequestParam("query") String query) throws SQLException {
         return giftRepository.search(query);
     }
 
     @GetMapping("/gifts")
+    @PreAuthorize("hasAuthority('VIEW_GIFT_LIST')")
     public String showGift(@RequestParam(name = "id", required = false) String id, Model model, Authentication authentication) {
         if (id == null) {
             model.addAttribute("gifts", giftRepository.getAll());
@@ -91,6 +96,7 @@ public class GiftController {
     }
 
     @PostMapping("/gifts")
+    @PreAuthorize("hasAuthority('CREATE_GIFT')")
     public String createGift(NewGift newGift) throws SQLException {
         List<Tag> tagList = this.tagRepository.getAll();
         List<Tag> tagsToInsert = newGift.getTags().stream().map(tagId -> tagList.stream().filter(tag -> tag.getId() == tagId).findFirst().get()).collect(Collectors.toList());
@@ -99,6 +105,7 @@ public class GiftController {
     }
 
     @GetMapping("/buy-gift/{id}")
+    @PreAuthorize("hasAuthority('BUY_GIFT')")
     public String showBuyCar(
             @PathVariable("id") int id,
             @RequestParam(required = false) boolean addressError,
@@ -117,6 +124,7 @@ public class GiftController {
     }
 
     @PostMapping("/buy-gift/{id}")
+    @PreAuthorize("hasAuthority('BUY_GIFT')")
     public String buyCar(@PathVariable("id") int id, @RequestParam(name = "count", required = true) int count, Address address, Model model) {
         if (address.getAddress().length() < 10) {
             return String.format("redirect:/buy-gift/%s?addressError=true", id);

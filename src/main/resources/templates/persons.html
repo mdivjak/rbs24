@@ -36,11 +36,12 @@
             <td th:text="${person.firstName}"></td>
             <td th:text="${person.lastName}"></td>
             <td th:text="${person.email}"></td>
-            <td><a th:href="@{/persons/{id}(id=${person.id})}">View profile</a></td>
+            <td><a sec:authorize="hasAuthority('VIEW_PERSON')" th:href="@{/persons/{id}(id=${person.id})}">View profile</a></td>
         </tr>
         </tbody>
     </table>
 
+    <sec:authorize access="hasAuthority('VIEW_PERSON')" var="hasViewPersonAuthority"></sec:authorize>
     <script>
         window.addEventListener('load', function() {
             let search = function () {
@@ -67,8 +68,10 @@
                             tdElement.textContent = person.email;
                             tableRowElement.appendChild(tdElement);
                             tdElement = document.createElement("td");
-                            tdElement.textContent = person.id;
-                            tdElement.innerHTML = '<a href="/persons/' + tdElement.textContent + '">View profile</a>';
+                            if('${hasViewPersonAuthority}' == true) {
+                                tdElement.textContent = person.id;
+                                tdElement.innerHTML = '<a href="/persons/' + tdElement.textContent + '">View profile</a>';
+                            }
                             tableRowElement.appendChild(tdElement);
 
                             tableContent.appendChild(tableRowElement);
