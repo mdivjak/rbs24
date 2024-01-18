@@ -44,6 +44,7 @@ public class PersonsController {
     @GetMapping("/persons/{id}")
     public String person(@PathVariable int id, Model model, HttpSession session)
             throws AccessDeniedException {
+        LOG.info("Viewing person " + id);
         User user = SecurityUtil.getCurrentUser();
         boolean isCurrentUser = user.getId() == id;
 
@@ -72,6 +73,7 @@ public class PersonsController {
     @GetMapping("/myprofile")
     @PreAuthorize("hasAuthority('VIEW_MY_PROFILE')")
     public String self(Model model, Authentication authentication, HttpSession session) {
+        LOG.info("Viewing my profile");
         User user = (User) authentication.getPrincipal();
         model.addAttribute("CSRF_TOKEN", session.getAttribute("CSRF_TOKEN"));
         model.addAttribute("person", personRepository.get("" + user.getId()));
@@ -82,6 +84,7 @@ public class PersonsController {
     @PreAuthorize("hasAuthority('UPDATE_PERSON')")
     public ResponseEntity<Void> person(@PathVariable int id, HttpSession session, @RequestParam("csrfToken")String csrfToken)
             throws AccessDeniedException {
+        LOG.info("Deleting person " + id);
         User user = SecurityUtil.getCurrentUser();
         boolean isCurrentUser = user.getId() == id;
 
@@ -98,12 +101,14 @@ public class PersonsController {
 
         if(!isAdmin && !isCurrentUser)
         {
+            LOG.warn("Not an admin and not current user");
             throw new AccessDeniedException("Forbidden");
         }
 
         String csrf = session.getAttribute("CSRF_TOKEN").toString();
         if(!csrf.equals(csrfToken))
         {
+            LOG.warn("Invalid CSRF token");
             throw new AccessDeniedException("Forbidden");
         }
         personRepository.delete(id);
@@ -116,6 +121,7 @@ public class PersonsController {
     @PreAuthorize("hasAuthority('UPDATE_PERSON')")
     public String updatePerson(Person person, Authentication authentication, HttpSession session, @RequestParam("csrfToken") String csrfToken)
             throws AccessDeniedException {
+        LOG.info("Updating person " + person.getId());
         User user = SecurityUtil.getCurrentUser();
         boolean isCurrentUser = user.getId() == Integer.parseInt(person.getId());
 
@@ -132,12 +138,14 @@ public class PersonsController {
 
         if(!isAdmin && !isCurrentUser)
         {
+            LOG.warn("Not an admin and not a current user");
             throw new AccessDeniedException("Forbidden");
         }
 
         String csrf = session.getAttribute("CSRF_TOKEN").toString();
         if(!csrf.equals(csrfToken))
         {
+            LOG.warn("Invalid CSRF token");
             throw new AccessDeniedException("Forbidden");
         }
         personRepository.update(person);
@@ -147,6 +155,7 @@ public class PersonsController {
     @GetMapping("/persons")
     @PreAuthorize("hasAuthority('VIEW_PERSONS_LIST')")
     public String persons(Model model) {
+        LOG.info("Viewing persons");
         model.addAttribute("persons", personRepository.getAll());
         return "persons";
     }
@@ -155,6 +164,7 @@ public class PersonsController {
     @ResponseBody
     @PreAuthorize("hasAuthority('VIEW_PERSONS_LIST')")
     public List<Person> searchPersons(@RequestParam String searchTerm) throws SQLException {
+        LOG.info("Searching persons");
         return personRepository.search(searchTerm);
     }
 }

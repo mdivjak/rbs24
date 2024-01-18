@@ -1,5 +1,6 @@
 package com.zuehlke.securesoftwaredevelopment.repository;
 
+import com.zuehlke.securesoftwaredevelopment.config.AuditLogger;
 import com.zuehlke.securesoftwaredevelopment.domain.Tag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,8 +32,9 @@ public class TagRepository {
             while (rs.next()) {
                 tagList.add(new Tag(rs.getInt(1), rs.getString(2)));
             }
+            LOG.info("Got all tags");
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOG.warn("Failed to get tags", e);
         }
         return tagList;
     }

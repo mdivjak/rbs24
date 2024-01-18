@@ -1,5 +1,6 @@
 package com.zuehlke.securesoftwaredevelopment.repository;
 
+import com.zuehlke.securesoftwaredevelopment.config.AuditLogger;
 import com.zuehlke.securesoftwaredevelopment.domain.Role;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,8 +36,9 @@ public class RoleRepository {
                 String name = rs.getString(2);
                 roles.add(new Role(id, name));
             }
+            LOG.info("Found roles for user " + userId);
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOG.warn("Failed to get roles for user " + userId, e);
         }
         return roles;
     }

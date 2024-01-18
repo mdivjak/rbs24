@@ -1,5 +1,6 @@
 package com.zuehlke.securesoftwaredevelopment.repository;
 
+import com.zuehlke.securesoftwaredevelopment.config.AuditLogger;
 import com.zuehlke.securesoftwaredevelopment.domain.Comment;
 import com.zuehlke.securesoftwaredevelopment.domain.Rating;
 import org.slf4j.Logger;
@@ -45,8 +46,9 @@ public class RatingRepository {
                 preparedStatement.setInt(3, rating.getRating());
                 preparedStatement.executeUpdate();
             }
+            AuditLogger.getAuditLogger(RatingRepository.class).audit("Changed rating");
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOG.warn("Failed to change rating", e);
         }
     }
 
@@ -59,8 +61,9 @@ public class RatingRepository {
             while (rs.next()) {
                 ratingList.add(new Rating(rs.getInt(1), rs.getInt(2), rs.getInt(3)));
             }
+            LOG.info("Got ratings for gift " + giftId);
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOG.warn("Failed to get rating for gift " + giftId, e);
         }
         return ratingList;
     }

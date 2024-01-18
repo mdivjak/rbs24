@@ -36,8 +36,9 @@ public class GiftRepository {
                 Gift gift = createGiftFromResultSet(rs);
                 giftList.add(gift);
             }
+            LOG.info("Got all gifts");
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOG.warn("Failed to get gifts", e);
         }
         return giftList;
     }
@@ -55,6 +56,7 @@ public class GiftRepository {
             while (rs.next()) {
                 giftList.add(createGiftFromResultSet(rs));
             }
+            LOG.info("Searched gifts");
         }
         return giftList;
     }
@@ -83,7 +85,7 @@ public class GiftRepository {
                 return gift;
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOG.warn("Failed to get gift with tags", e);
         }
 
         return null;
@@ -115,8 +117,9 @@ public class GiftRepository {
                     }
                 });
             }
+            AuditLogger.getAuditLogger(GiftRepository.class).audit("Created new gift");
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOG.warn("Failed to create new gift", e);
         }
         return id;
     }
@@ -133,8 +136,9 @@ public class GiftRepository {
             statement.executeUpdate(query2);
             statement.executeUpdate(query3);
             statement.executeUpdate(query4);
+            AuditLogger.getAuditLogger(GiftRepository.class).audit("Deleted a gift");
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOG.warn("Failed to delete a gift " + giftId, e);
         }
     }
 

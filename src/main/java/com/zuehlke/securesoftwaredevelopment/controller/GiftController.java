@@ -41,6 +41,7 @@ public class GiftController {
     @GetMapping("/")
     @PreAuthorize("hasAuthority('VIEW_GIFT_LIST')")
     public String showSearch(Model model) {
+        LOG.info("Listing gifts");
         model.addAttribute("gifts", giftRepository.getAll());
         return "gifts";
     }
@@ -48,6 +49,7 @@ public class GiftController {
     @GetMapping("/create-form")
     @PreAuthorize("hasAuthority('CREATE_GIFT')")
     public String CreateForm(Model model) {
+        LOG.info("Opening gift create form");
         model.addAttribute("tags", tagRepository.getAll());
         return "create-form";
     }
@@ -56,12 +58,14 @@ public class GiftController {
     @ResponseBody
     @PreAuthorize("hasAuthority('VIEW_GIFT_LIST')")
     public List<Gift> search(@RequestParam("query") String query) throws SQLException {
+        LOG.info("Searching gifts");
         return giftRepository.search(query);
     }
 
     @GetMapping("/gifts")
     @PreAuthorize("hasAuthority('VIEW_GIFT_LIST')")
     public String showGift(@RequestParam(name = "id", required = false) String id, Model model, Authentication authentication) {
+        LOG.info("Viewing gifts");
         if (id == null) {
             model.addAttribute("gifts", giftRepository.getAll());
             return "gifts";
@@ -98,6 +102,7 @@ public class GiftController {
     @PostMapping("/gifts")
     @PreAuthorize("hasAuthority('CREATE_GIFT')")
     public String createGift(NewGift newGift) throws SQLException {
+        LOG.info("Creating gift");
         List<Tag> tagList = this.tagRepository.getAll();
         List<Tag> tagsToInsert = newGift.getTags().stream().map(tagId -> tagList.stream().filter(tag -> tag.getId() == tagId).findFirst().get()).collect(Collectors.toList());
         Long id = giftRepository.create(newGift, tagsToInsert);
@@ -111,12 +116,13 @@ public class GiftController {
             @RequestParam(required = false) boolean addressError,
             @RequestParam(required = false) boolean bought,
             Model model) {
-
         model.addAttribute("id", id);
 
         if (addressError) {
+            LOG.warn("Address error during purchase");
             model.addAttribute("addressError", true);
         } else if (bought) {
+            LOG.info("Successful purchase");
             model.addAttribute("bought", true);
         }
 
@@ -126,6 +132,7 @@ public class GiftController {
     @PostMapping("/buy-gift/{id}")
     @PreAuthorize("hasAuthority('BUY_GIFT')")
     public String buyCar(@PathVariable("id") int id, @RequestParam(name = "count", required = true) int count, Address address, Model model) {
+        LOG.info("Buying gift");
         if (address.getAddress().length() < 10) {
             return String.format("redirect:/buy-gift/%s?addressError=true", id);
         }

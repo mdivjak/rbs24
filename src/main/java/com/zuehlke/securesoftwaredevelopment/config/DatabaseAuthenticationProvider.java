@@ -2,6 +2,7 @@ package com.zuehlke.securesoftwaredevelopment.config;
 
 import com.zuehlke.securesoftwaredevelopment.domain.Permission;
 import com.zuehlke.securesoftwaredevelopment.domain.User;
+import com.zuehlke.securesoftwaredevelopment.repository.GiftRepository;
 import com.zuehlke.securesoftwaredevelopment.repository.UserRepository;
 import com.zuehlke.securesoftwaredevelopment.service.PermissionService;
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -42,7 +43,12 @@ public class DatabaseAuthenticationProvider implements AuthenticationProvider {
         if (success) {
             User user = userRepository.findUser(username);
             List<GrantedAuthority> grantedAuthorities = getGrantedAuthorities(user);
+            AuditLogger.getAuditLogger(DatabaseAuthenticationProvider.class).audit("Authenticated user " + username);
             return new UsernamePasswordAuthenticationToken(user, password, grantedAuthorities);
+        }
+        else
+        {
+            AuditLogger.getAuditLogger(DatabaseAuthenticationProvider.class).audit("Failed authentication for username " + username);
         }
 
         throw new BadCredentialsException(String.format(PASSWORD_WRONG_MESSAGE, username, password));

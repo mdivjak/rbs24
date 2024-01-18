@@ -1,5 +1,6 @@
 package com.zuehlke.securesoftwaredevelopment.repository;
 
+import com.zuehlke.securesoftwaredevelopment.config.AuditLogger;
 import com.zuehlke.securesoftwaredevelopment.domain.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,10 +32,11 @@ public class UserRepository {
                 int id = rs.getInt(1);
                 String username1 = rs.getString(2);
                 String password = rs.getString(3);
+                LOG.info("Found user for username");
                 return new User(id, username1, password);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOG.warn("Failed to find user with username " + username, e);
         }
         return null;
     }
@@ -44,9 +46,10 @@ public class UserRepository {
         try (Connection connection = dataSource.getConnection();
              Statement statement = connection.createStatement();
              ResultSet rs = statement.executeQuery(query)) {
+            LOG.info("Found user with username and password");
             return rs.next();
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOG.warn("Could not validate credentials", e);
         }
         return false;
     }
@@ -57,8 +60,9 @@ public class UserRepository {
              Statement statement = connection.createStatement();
         ) {
             statement.executeUpdate(query);
+            LOG.info("Deleted user with id " + userId);
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOG.warn("Failed to delete user " + userId, e);
         }
     }
 }

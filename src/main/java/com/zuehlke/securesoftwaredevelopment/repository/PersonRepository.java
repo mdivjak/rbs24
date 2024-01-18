@@ -33,8 +33,9 @@ public class PersonRepository {
             while (rs.next()) {
                 personList.add(createPersonFromResultSet(rs));
             }
+            LOG.info("Got all persons");
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOG.warn("Failed to get all persons", e);
         }
         return personList;
     }
@@ -49,6 +50,7 @@ public class PersonRepository {
             while (rs.next()) {
                 personList.add(createPersonFromResultSet(rs));
             }
+            LOG.info("Searched persons");
         }
         return personList;
     }
@@ -62,7 +64,7 @@ public class PersonRepository {
                 return createPersonFromResultSet(rs);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOG.warn("Failed to get person " + personId, e);
         }
 
         return null;
@@ -74,8 +76,9 @@ public class PersonRepository {
              Statement statement = connection.createStatement();
         ) {
             statement.executeUpdate(query);
+            AuditLogger.getAuditLogger(PersonRepository.class).audit("Deleted a person");
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOG.warn("Failed to delete person " + personId, e);
         }
     }
 
@@ -99,8 +102,9 @@ public class PersonRepository {
             statement.setString(1, firstName);
             statement.setString(2, email);
             statement.executeUpdate();
+            AuditLogger.getAuditLogger(PersonRepository.class).audit("Updated person " + personUpdate.getId());
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOG.warn("Failed to update person " + personUpdate.getId(), e);
         }
     }
 }

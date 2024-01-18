@@ -1,5 +1,7 @@
 package com.zuehlke.securesoftwaredevelopment.repository;
 
+import com.zuehlke.securesoftwaredevelopment.config.AuditLogger;
+import com.zuehlke.securesoftwaredevelopment.controller.CommentController;
 import com.zuehlke.securesoftwaredevelopment.domain.Comment;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,8 +34,9 @@ public class CommentRepository {
             statement.setInt(2, comment.getUserId());
             statement.setString(3, comment.getComment());
             statement.executeUpdate();
+            LOG.info("Created new comment");
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOG.warn("Failed to create comment", e);
         }
     }
 
@@ -46,8 +49,9 @@ public class CommentRepository {
             while (rs.next()) {
                 commentList.add(new Comment(rs.getInt(1), rs.getInt(2), rs.getString(3)));
             }
+            LOG.info("Got comments for gift");
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOG.warn("Failed to find comments for gift " + giftId, e);
         }
         return commentList;
     }

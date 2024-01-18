@@ -1,5 +1,6 @@
 package com.zuehlke.securesoftwaredevelopment.controller;
 
+import com.zuehlke.securesoftwaredevelopment.config.AuditLogger;
 import com.zuehlke.securesoftwaredevelopment.domain.Comment;
 import com.zuehlke.securesoftwaredevelopment.domain.Rating;
 import com.zuehlke.securesoftwaredevelopment.domain.User;
@@ -27,6 +28,7 @@ public class RatingsController {
     @PostMapping(value = "/ratings", consumes = "application/json")
     @PreAuthorize("hasAuthority('RATE_GIFT')")
     public String createOrUpdateRating(@RequestBody Rating rating, Authentication authentication) {
+        LOG.info("Changing gift rating");
         User user = (User) authentication.getPrincipal();
         rating.setUserId(user.getId());
         ratingRepository.createOrUpdate(rating);

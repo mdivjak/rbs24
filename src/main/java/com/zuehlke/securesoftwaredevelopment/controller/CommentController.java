@@ -1,8 +1,10 @@
 package com.zuehlke.securesoftwaredevelopment.controller;
 
+import com.zuehlke.securesoftwaredevelopment.config.AuditLogger;
 import com.zuehlke.securesoftwaredevelopment.domain.Comment;
 import com.zuehlke.securesoftwaredevelopment.domain.User;
 import com.zuehlke.securesoftwaredevelopment.repository.CommentRepository;
+import com.zuehlke.securesoftwaredevelopment.repository.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
@@ -23,8 +25,9 @@ public class CommentController {
     }
 
     @PostMapping(value = "/comments", consumes = "application/json")
-    @PreAuthorize("hasAuthority('CAR_DETAILS_EDIT')")
+    @PreAuthorize("hasAuthority('ADD_COMMENT')")
     public ResponseEntity<Void> createComment(@RequestBody Comment comment, Authentication authentication) {
+        LOG.info("Creating comment");
         User user = (User) authentication.getPrincipal();
         comment.setUserId(user.getId());
         commentRepository.create(comment);
